@@ -47,7 +47,8 @@ class ClientHandler implements Runnable {
         vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
         
     }
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void run() {
     
         Scanner s = new Scanner(System.in);
@@ -67,7 +68,10 @@ class ClientHandler implements Runnable {
                 ObjectInputStream in = new ObjectInputStream(client.getInputStream());
                 
                 out.writeObject(message);
+                vc.tock();
+                out.writeObject(vc);
                 System.out.println("Peer " + peerPort + " ha risposto: " + (String) in.readObject());
+                vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
                 
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
