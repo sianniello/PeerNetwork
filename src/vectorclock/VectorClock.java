@@ -1,9 +1,10 @@
 package vectorclock;
 
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
-public class VectorClock {
+public class VectorClock implements Serializable{
 
 	private HashMap<InetSocketAddress, Integer> vector;
 	private InetSocketAddress key;

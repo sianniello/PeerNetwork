@@ -47,6 +47,7 @@ class ClientHandler implements Runnable {
         vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
         
     }
+    
     @SuppressWarnings("unchecked")
 	@Override
     public void run() {
