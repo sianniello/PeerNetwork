@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package peer;
 
 import java.io.IOException;
@@ -15,14 +10,15 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author daniele
- */
+import vectorclock.VectorClock;
+
 class ClientHandler implements Runnable {
     private int port;// questa è la porta della parte Server del peer
-    public ClientHandler(int port) {
+    private VectorClock vc;
+    
+    public ClientHandler(int port, VectorClock vc) {
         this.port = port;
+        this.vc = vc;
     }
 
     public void show(HashSet<InetSocketAddress> set){
@@ -41,6 +37,7 @@ class ClientHandler implements Runnable {
         
         out.writeObject(new InetSocketAddress(port));
         show((HashSet<InetSocketAddress>) in.readObject());
+        vc.receiveAction((VectorClock)in.readObject());
         
     }
     @Override

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package joinserver;
 
 import java.io.IOException;
@@ -17,20 +12,20 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author daniele
- */
+import vectorclock.VectorClock;
+
 public class JoinServer {
     
     private int port;
     private ServerSocket server;
     private HashSet<InetSocketAddress> set;
+    private VectorClock vc;
 
     public JoinServer(int port) throws IOException {
         this.port = port;
         server = new ServerSocket(port);
         set = new HashSet<>();
+        vc = new VectorClock();
         System.out.println("Server listening at: " + port);
     }
     
@@ -42,7 +37,7 @@ public class JoinServer {
         
         while(true){
             client = server.accept();
-            executor.execute(new ServerHandler(client, set));
+            executor.execute(new ServerHandler(client, set, vc));
         }
      
     }

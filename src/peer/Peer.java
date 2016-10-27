@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package peer;
 
 import java.io.IOException;
@@ -12,23 +7,22 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import toctocprotocol.TocTocProtocol;
+import vectorclock.VectorClock;
 
-/**
- *
- * @author daniele
- */
 public class Peer {
     
     private int port;
     private ServerSocket server;
     private TocTocProtocol ttp;
+    private VectorClock vc;
+    
     public Peer(int port) throws IOException {
         this.port = port;
-        
+        vc = new VectorClock();
         ttp= new TocTocProtocol();
         server = new ServerSocket(port);
         
-        (new Thread(new ClientHandler(port))).start();
+        (new Thread(new ClientHandler(port, vc))).start();
         
         Executor executor = Executors.newFixedThreadPool(1500);
         

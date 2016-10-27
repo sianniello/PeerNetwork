@@ -1,14 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package toctocprotocol;
 
-/**
- *
- * @author daniele
- */
 public class TocTocProtocol {
  
     private static final int WAIT =0;
@@ -29,7 +20,7 @@ public class TocTocProtocol {
         switch(state){
             case WAIT: if(in.compareTo("Toc Toc")==0){
                             state = COMMIT;
-                            out = "Chi Ã¨?";
+                            out = "Chi è";
                         
                         }else if(++n_err<3){
                             out="Devi dire Toc Toc";
