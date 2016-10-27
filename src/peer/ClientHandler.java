@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -16,9 +17,9 @@ class ClientHandler implements Runnable {
     private int port;// questa è la porta della parte Server del peer
     private VectorClock vc;
     
-    public ClientHandler(int port, VectorClock vc) {
+    public ClientHandler(int port) {
         this.port = port;
-        this.vc = vc;
+        vc = new VectorClock();
     }
 
     public void show(HashSet<InetSocketAddress> set){
@@ -26,7 +27,9 @@ class ClientHandler implements Runnable {
         for(InetSocketAddress addr: set)
             System.out.println(addr.getPort());
     }
-    public void join() throws IOException, ClassNotFoundException{
+    
+    @SuppressWarnings({ "resource", "unchecked" })
+	public void join() throws IOException, ClassNotFoundException{
         Socket client = null;
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
@@ -35,9 +38,13 @@ class ClientHandler implements Runnable {
         out = new ObjectOutputStream(client.getOutputStream());
         in = new ObjectInputStream(client.getInputStream());
         
+        vc.setKey(new InetSocketAddress(port));
+        
         out.writeObject(new InetSocketAddress(port));
+        out.writeObject(vc);
+        vc.tock();
         show((HashSet<InetSocketAddress>) in.readObject());
-        vc.receiveAction((VectorClock)in.readObject());
+        vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
         
     }
     @Override
@@ -62,9 +69,7 @@ class ClientHandler implements Runnable {
                 out.writeObject(message);
                 System.out.println("Peer " + peerPort + " ha risposto: " + (String) in.readObject());
                 
-            } catch (IOException ex) {
-                Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
+            } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

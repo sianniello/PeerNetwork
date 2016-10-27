@@ -18,11 +18,10 @@ public class Peer {
     
     public Peer(int port) throws IOException {
         this.port = port;
-        vc = new VectorClock();
         ttp= new TocTocProtocol();
         server = new ServerSocket(port);
         
-        (new Thread(new ClientHandler(port, vc))).start();
+        (new Thread(new ClientHandler(port))).start();
         
         Executor executor = Executors.newFixedThreadPool(1500);
         
