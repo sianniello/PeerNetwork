@@ -19,7 +19,7 @@ class ClientHandler implements Runnable {
     
     public ClientHandler(int port) {
         this.port = port;
-        vc = new VectorClock();
+        vc = new VectorClock(new InetSocketAddress(port));
     }
 
     public void show(HashSet<InetSocketAddress> set){
@@ -38,15 +38,13 @@ class ClientHandler implements Runnable {
         out = new ObjectOutputStream(client.getOutputStream());
         in = new ObjectInputStream(client.getInputStream());
         
-        vc.setKey(new InetSocketAddress(port));
-        
         out.writeObject(new InetSocketAddress(port));
         out.writeObject(vc.getVector());
         vc.tock();
-        //System.out.println(vc.toString());
+        System.out.println(vc.toString());
         show((HashSet<InetSocketAddress>) in.readObject());
         vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
-        //System.out.println(vc.toString());
+        System.out.println(vc.toString());
         
     }
     
@@ -71,8 +69,9 @@ class ClientHandler implements Runnable {
                 ObjectInputStream in = new ObjectInputStream(client.getInputStream());
                 
                 out.writeObject(message);
-                out.writeObject(vc.getVector());
                 vc.tock();
+                out.writeObject(vc.getVector());
+                
                 System.out.println("Peer " + peerPort + " ha risposto: " + (String) in.readObject());
                 vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
                 

@@ -13,6 +13,13 @@ public class VectorClock implements Serializable{
 		vector = new HashMap<>();
 	}
 	
+	public VectorClock(InetSocketAddress inetSocketAddress) {
+		vector = new HashMap<>();
+		this.key = inetSocketAddress;
+		vector.put(key, 1);
+		tock();
+	}
+
 	public void setKey(InetSocketAddress k) {
 		this.key = k;
 		vector.put(k, 1);

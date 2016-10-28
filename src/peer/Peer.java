@@ -7,14 +7,12 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import toctocprotocol.TocTocProtocol;
-import vectorclock.VectorClock;
 
 public class Peer {
     
     private int port;
     private ServerSocket server;
     private TocTocProtocol ttp;
-    private VectorClock vc;
     
     public Peer(int port) throws IOException {
         this.port = port;
@@ -26,7 +24,7 @@ public class Peer {
         Executor executor = Executors.newFixedThreadPool(1500);
         
         while(true){
-            executor.execute(new ServerHandler(server.accept(), ttp));
+            executor.execute(new ServerHandler(server.accept(), ttp, server.getLocalSocketAddress()));
         }
         
     }

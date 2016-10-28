@@ -18,13 +18,11 @@ public class JoinServer {
     private int port;
     private ServerSocket server;
     private HashSet<InetSocketAddress> set;
-    private VectorClock vc;
 
     public JoinServer(int port) throws IOException {
         this.port = port;
         server = new ServerSocket(port);
         set = new HashSet<>();
-        vc = new VectorClock();
         System.out.println("Server listening at: " + port);
     }
     
@@ -36,7 +34,7 @@ public class JoinServer {
         
         while(true){
             client = server.accept();
-            executor.execute(new ServerHandler(client, set, vc));
+            executor.execute(new ServerHandler(client, set));
         }
      
     }

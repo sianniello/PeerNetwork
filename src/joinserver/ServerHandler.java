@@ -21,10 +21,10 @@ class ServerHandler implements Runnable {
 	private VectorClock vc;
 
 
-	public ServerHandler(Socket client, HashSet<InetSocketAddress> set, VectorClock vc) throws IOException {
+	public ServerHandler(Socket client, HashSet<InetSocketAddress> set) throws IOException {
 		this.client = client;
 		this.set = set;
-		this.vc = vc;
+		vc = new VectorClock();
 		out = new ObjectOutputStream(client.getOutputStream());
 		in = new ObjectInputStream(client.getInputStream());
 
@@ -35,21 +35,25 @@ class ServerHandler implements Runnable {
 	public void run() {
 
 		try {
-			InetSocketAddress address = (InetSocketAddress) in.readObject();
-			HashMap<InetSocketAddress, Integer> hm = (HashMap<InetSocketAddress, Integer>) in.readObject();
+			
+			InetSocketAddress address = (InetSocketAddress) in.readObject();	//riceve dal peer il suo indirizzo
+			HashMap<InetSocketAddress, Integer> hm = (HashMap<InetSocketAddress, Integer>) in.readObject();	//riceve dal peer il suo VectorClock
 
 			System.out.println("Server " + Thread.currentThread().getName() + " ricevuto: " + address.toString()); 
+			System.out.println("Server " + Thread.currentThread().getName() + " ricevuto: " + hm.toString());
+			
 			synchronized(this){
 				set.add(address);
-				for(InetSocketAddress isa : hm.keySet())
-					if(vc.getVector().containsKey(isa))
-						vc.getVector().replace(isa, hm.get(isa));
-					else
-						vc.getVector().put(isa, hm.get(isa));
 			}
+			
+			for(InetSocketAddress isa : hm.keySet())
+				if(vc.getVector().containsKey(isa))
+					vc.getVector().replace(isa, hm.get(isa));
+				else
+					vc.getVector().put(isa, hm.get(isa));
 
 			out.writeObject(set);
-			out.writeObject(vc);
+			out.writeObject(vc.getVector());
 			System.out.println(vc.toString());
 
 		} catch (IOException | ClassNotFoundException ex) {
