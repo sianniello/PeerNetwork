@@ -41,10 +41,12 @@ class ClientHandler implements Runnable {
         vc.setKey(new InetSocketAddress(port));
         
         out.writeObject(new InetSocketAddress(port));
-        out.writeObject(vc);
+        out.writeObject(vc.getVector());
         vc.tock();
+        //System.out.println(vc.toString());
         show((HashSet<InetSocketAddress>) in.readObject());
         vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
+        //System.out.println(vc.toString());
         
     }
     
@@ -69,8 +71,8 @@ class ClientHandler implements Runnable {
                 ObjectInputStream in = new ObjectInputStream(client.getInputStream());
                 
                 out.writeObject(message);
+                out.writeObject(vc.getVector());
                 vc.tock();
-                out.writeObject(vc);
                 System.out.println("Peer " + peerPort + " ha risposto: " + (String) in.readObject());
                 vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
                 

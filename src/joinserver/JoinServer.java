@@ -4,34 +4,39 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import vectorclock.VectorClock;
+
 public class JoinServer {
     
     private int port;
     private ServerSocket server;
     private HashSet<InetSocketAddress> set;
+    private VectorClock vc;
 
     public JoinServer(int port) throws IOException {
         this.port = port;
         server = new ServerSocket(port);
         set = new HashSet<>();
+        vc = new VectorClock();
         System.out.println("Server listening at: " + port);
     }
     
     public void execute() throws IOException{
         
-        Socket client =null;
+        Socket client = null;
         
         Executor executor = Executors.newFixedThreadPool(1000);
         
         while(true){
             client = server.accept();
-            executor.execute(new ServerHandler(client, set));
+            executor.execute(new ServerHandler(client, set, vc));
         }
      
     }

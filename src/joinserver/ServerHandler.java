@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,12 +21,10 @@ class ServerHandler implements Runnable {
 	private VectorClock vc;
 
 
-	public ServerHandler(Socket client, HashSet<InetSocketAddress> set) throws IOException {
+	public ServerHandler(Socket client, HashSet<InetSocketAddress> set, VectorClock vc) throws IOException {
 		this.client = client;
 		this.set = set;
-		
-		vc = new VectorClock();
-		
+		this.vc = vc;
 		out = new ObjectOutputStream(client.getOutputStream());
 		in = new ObjectInputStream(client.getInputStream());
 
@@ -37,15 +36,21 @@ class ServerHandler implements Runnable {
 
 		try {
 			InetSocketAddress address = (InetSocketAddress) in.readObject();
-			vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
+			HashMap<InetSocketAddress, Integer> hm = (HashMap<InetSocketAddress, Integer>) in.readObject();
+
 			System.out.println("Server " + Thread.currentThread().getName() + " ricevuto: " + address.toString()); 
-			
 			synchronized(this){
 				set.add(address);
+				for(InetSocketAddress isa : hm.keySet())
+					if(vc.getVector().containsKey(isa))
+						vc.getVector().replace(isa, hm.get(isa));
+					else
+						vc.getVector().put(isa, hm.get(isa));
 			}
-			
+
 			out.writeObject(set);
 			out.writeObject(vc);
+			System.out.println(vc.toString());
 
 		} catch (IOException | ClassNotFoundException ex) {
 			Logger.getLogger(ServerHandler.class.getName()).log(Level.SEVERE, null, ex);

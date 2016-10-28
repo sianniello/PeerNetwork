@@ -29,6 +29,11 @@ public class VectorClock implements Serializable{
 	public void receiveAction(HashMap<InetSocketAddress, Integer> v) {
 			v.put(key, vector.get(key));
 			vector = v;
+			tock();
+	}
+	
+	public String toString() {
+		return "VECTOR CLOCK: [" + vector.toString() + "]";
 	}
 	
 }
