@@ -38,12 +38,12 @@ class ClientHandler implements Runnable {
         out = new ObjectOutputStream(client.getOutputStream());
         in = new ObjectInputStream(client.getInputStream());
         
-        out.writeObject(new InetSocketAddress(port));
-        out.writeObject(vc.getVector());
+        out.writeObject(new InetSocketAddress(port));	//il client spedisce il proprio indirizzo
+        out.writeObject(vc.getVector());	//il client spedisce il proprio vector clock
         vc.tock();
         System.out.println(vc.toString());
-        show((HashSet<InetSocketAddress>) in.readObject());
-        vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());
+        show((HashSet<InetSocketAddress>) in.readObject());	//il client riceve la lista degli indirizzi disponibili
+        vc.receiveAction((HashMap<InetSocketAddress, Integer>) in.readObject());	//il client riceve il VectorClock
         System.out.println(vc.toString());
         
     }
